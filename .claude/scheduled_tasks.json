@@ -1,0 +1,11 @@
+{
+  "tasks": [
+    {
+      "id": "01554755",
+      "cron": "3 8 * * 1",
+      "prompt": "Run the weekly stock picker analysis. Change directory to /home/javastarchild/dev/stock_picker and execute: python -c \"import logging; logging.basicConfig(level=logging.INFO, format='[%(name)s] %(levelname)s: %(message)s'); from stock_picker_agents import create_custom_config, create_orchestrator; config = create_custom_config(max_tickers=20, forecast_days=7); orchestrator = create_orchestrator(config); results = orchestrator.run_analysis('technology', lookback_months=6); print(f'Done: {results[\\\"successful_forecasts\\\"]}/{results[\\\"total_tickers\\\"]} tickers. Report: {results[\\\"report_path\\\"]}') if results['success'] else print(f'Failed: {results.get(\\\"error\\\")}')\" Then report the result to the user.",
+      "createdAt": 1775002028858,
+      "recurring": true
+    }
+  ]
+}

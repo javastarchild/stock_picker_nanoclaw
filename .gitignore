@@ -1,0 +1,6 @@
+report/
+.cache/
+.pytest_cache
+__pycache__/
+.venv/
+create_git.sh

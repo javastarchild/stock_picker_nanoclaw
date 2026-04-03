@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock Prediction Accuracy Analyzer</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+        }
+        
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .upload-section {
+            background: #f8f9fa;
+            border: 2px dashed #667eea;
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+            margin-bottom: 30px;
+            transition: all 0.3s ease;
+        }
+        
+        .upload-section:hover {
+            border-color: #764ba2;
+            background: #f0f4ff;
+            transform: translateY(-2px);
+        }
+        
+        input[type="file"] {
+            margin: 10px;
+            padding: 12px;
+            border: 2px solid #667eea;
+            border-radius: 8px;
+            background: white;
+            font-size: 14px;
+        }
+        
+        button {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            margin: 10px;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+        
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .results {
+            margin-top: 30px;
+        }
+        
+        .summary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .summary h2 {
+            margin: 0 0 15px 0;
+            font-size: 1.8em;
+        }
+        
+        .metric {
+            display: inline-block;
+            margin: 10px 20px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .metric-value {
+            font-size: 2em;
+            font-weight: bold;
+            display: block;
+        }
+        
+        .metric-label {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        th {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: bold;
+        }
+        
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        tr:hover {
+            background: #f8f9ff;
+        }
+        
+        .accuracy-good { color: #27ae60; font-weight: bold; }
+        .accuracy-fair { color: #f39c12; font-weight: bold; }
+        .accuracy-poor { color: #e74c3c; font-weight: bold; }
+        
+        .error {
+            background: #fff5f5;
+            border: 1px solid #feb2b2;
+            color: #c53030;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+        
+        .instruction {
+            background: #e8f4ff;
+            border: 1px solid #bee3f8;
+            color: #2b6cb0;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .instruction h3 {
+            margin-top: 0;
+            color: #2c5aa0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📈 Stock Prediction Accuracy Analyzer</h1>
+        
+        <div class="instruction">
+            <h3>How to Use:</h3>
+            <p><strong>Step 1:</strong> Upload your prediction CSV file (like the one you provided)</p>
+            <p><strong>Step 2:</strong> Upload an actual prices CSV file with the same format containing real market data</p>
+            <p><strong>Step 3:</strong> Click "Analyze Predictions" to see accuracy metrics</p>
+            <br>
+            <p><strong>Note:</strong> Since the dates in your example (Aug 9-15, 2025) are in the future, you'll need to wait until after those dates to get actual stock prices for comparison. For demonstration, you can create a mock "actual prices" file with realistic price movements.</p>
+        </div>
+        
+        <div class="upload-section">
+            <h3>📊 Upload Files</h3>
+            <div>
+                <label for="predictionsFile">Predictions CSV:</label>
+                <input type="file" id="predictionsFile" accept=".csv" />
+            </div>
+            <div>
+                <label for="actualFile">Actual Prices CSV:</label>
+                <input type="file" id="actualFile" accept=".csv" />
+            </div>
+            <button id="analyzeBtn" onclick="analyzePredictions()">Analyze Predictions</button>
+            <button onclick="generateSampleActual()">Generate Sample Actual Data</button>
+        </div>
+        
+        <div id="results" class="results"></div>
+    </div>
+
+    <script>
+        let predictionsData = null;
+        let actualData = null;
+
+        document.getElementById('predictionsFile').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    predictionsData = parseCSV(e.target.result);
+                    console.log('Predictions loaded:', predictionsData.length, 'rows');
+                };
+                reader.readAsText(file);
+            }
+        });
+
+        document.getElementById('actualFile').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    actualData = parseCSV(e.target.result);
+                    console.log('Actual data loaded:', actualData.length, 'rows');
+                };
+                reader.readAsText(file);
+            }
+        });
+
+        function parseCSV(text) {
+            const lines = text.trim().split('\n');
+            const headers = lines[0].split(',');
+            const data = [];
+            
+            for (let i = 1; i < lines.length; i++) {
+                const values = lines[i].split(',');
+                const row = {};
+                headers.forEach((header, index) => {
+                    row[header.trim()] = values[index] ? values[index].trim() : '';
+                });
+                data.push(row);
+            }
+            
+            return data;
+        }
+
+        function generateSampleActual() {
+            if (!predictionsData) {
+                alert('Please upload the predictions file first!');
+                return;
+            }
+
+            // Generate realistic sample actual data with some variation from predictions
+            let csvContent = 'ticker,2025-08-09,2025-08-10,2025-08-11,2025-08-12,2025-08-13,2025-08-14,2025-08-15,7_Day_Change,7_Day_Change_Pct\n';
+            
+            predictionsData.forEach(row => {
+                const ticker = row.ticker;
+                const startPrice = parseFloat(row['2025-08-09']);
+                let prices = [startPrice];
+                
+                // Generate realistic daily price movements
+                for (let i = 1; i < 7; i++) {
+                    const dailyChange = (Math.random() - 0.5) * 0.04; // ±2% daily variation
+                    const newPrice = prices[i-1] * (1 + dailyChange);
+                    prices.push(newPrice);
+                }
+                
+                const totalChange = prices[6] - prices[0];
+                const totalChangePct = (totalChange / prices[0]) * 100;
+                
+                csvContent += `${ticker},${prices.map(p => p.toFixed(2)).join(',')},${totalChange.toFixed(2)},${totalChangePct.toFixed(2)}\n`;
+            });
+            
+            // Download the generated file
+            const blob = new Blob([csvContent], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.style.display = 'none';
+            a.href = url;
+            a.download = 'sample_actual_prices.csv';
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            
+            alert('Sample actual data generated and downloaded! Upload this file as your "Actual Prices CSV" to test the analyzer.');
+        }
+
+        function analyzePredictions() {
+            if (!predictionsData || !actualData) {
+                alert('Please upload both prediction and actual data files!');
+                return;
+            }
+
+            const analysis = performAnalysis();
+            displayResults(analysis);
+        }
+
+        function performAnalysis() {
+            const results = [];
+            let totalAbsoluteError = 0;
+            let totalSquaredError = 0;
+            let correctDirectionCount = 0;
+            let totalStocks = 0;
+
+            const dateCols = ['2025-08-09', '2025-08-10', '2025-08-11', '2025-08-12', '2025-08-13', '2025-08-14', '2025-08-15'];
+
+            predictionsData.forEach(predRow => {
+                const ticker = predRow.ticker;
+                const actualRow = actualData.find(row => row.ticker === ticker);
+                
+                if (!actualRow) return;
+
+                const predStart = parseFloat(predRow[dateCols[0]]);
+                const predEnd = parseFloat(predRow[dateCols[6]]);
+                const actualStart = parseFloat(actualRow[dateCols[0]]);
+                const actualEnd = parseFloat(actualRow[dateCols[6]]);
+
+                const predChange = predEnd - predStart;
+                const actualChange = actualEnd - actualStart;
+                
+                const predChangePct = (predChange / predStart) * 100;
+                const actualChangePct = (actualChange / actualStart) * 100;
+                
+                const absoluteError = Math.abs(predChangePct - actualChangePct);
+                const squaredError = Math.pow(predChangePct - actualChangePct, 2);
+                
+                // Check if direction is correct
+                const predDirection = predChange >= 0 ? 'up' : 'down';
+                const actualDirection = actualChange >= 0 ? 'up' : 'down';
+                const directionCorrect = predDirection === actualDirection;
+                
+                if (directionCorrect) correctDirectionCount++;
+                
+                totalAbsoluteError += absoluteError;
+                totalSquaredError += squaredError;
+                totalStocks++;
+
+                results.push({
+                    ticker,
+                    predStart,
+                    predEnd,
+                    actualStart,
+                    actualEnd,
+                    predChange,
+                    actualChange,
+                    predChangePct,
+                    actualChangePct,
+                    absoluteError,
+                    directionCorrect
+                });
+            });
+
+            const mae = totalAbsoluteError / totalStocks; // Mean Absolute Error
+            const rmse = Math.sqrt(totalSquaredError / totalStocks); // Root Mean Squared Error
+            const directionAccuracy = (correctDirectionCount / totalStocks) * 100;
+
+            return {
+                results,
+                mae,
+                rmse,
+                directionAccuracy,
+                totalStocks
+            };
+        }
+
+        function displayResults(analysis) {
+            const resultsDiv = document.getElementById('results');
+            
+            let html = `
+                <div class="summary">
+                    <h2>📊 Prediction Accuracy Summary</h2>
+                    <div class="metric">
+                        <span class="metric-value">${analysis.mae.toFixed(2)}%</span>
+                        <span class="metric-label">Mean Absolute Error</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-value">${analysis.rmse.toFixed(2)}%</span>
+                        <span class="metric-label">Root Mean Squared Error</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-value">${analysis.directionAccuracy.toFixed(1)}%</span>
+                        <span class="metric-label">Direction Accuracy</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-value">${analysis.totalStocks}</span>
+                        <span class="metric-label">Stocks Analyzed</span>
+                    </div>
+                </div>
+                
+                <h3>📈 Detailed Results by Stock</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Ticker</th>
+                            <th>Predicted Start</th>
+                            <th>Predicted End</th>
+                            <th>Actual Start</th>
+                            <th>Actual End</th>
+                            <th>Predicted Change %</th>
+                            <th>Actual Change %</th>
+                            <th>Absolute Error %</th>
+                            <th>Direction Correct</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+            
+            analysis.results.forEach(result => {
+                const errorClass = result.absoluteError < 1 ? 'accuracy-good' : 
+                                 result.absoluteError < 3 ? 'accuracy-fair' : 'accuracy-poor';
+                
+                html += `
+                    <tr>
+                        <td><strong>${result.ticker}</strong></td>
+                        <td>$${result.predStart.toFixed(2)}</td>
+                        <td>$${result.predEnd.toFixed(2)}</td>
+                        <td>$${result.actualStart.toFixed(2)}</td>
+                        <td>$${result.actualEnd.toFixed(2)}</td>
+                        <td>${result.predChangePct.toFixed(2)}%</td>
+                        <td>${result.actualChangePct.toFixed(2)}%</td>
+                        <td class="${errorClass}">${result.absoluteError.toFixed(2)}%</td>
+                        <td>${result.directionCorrect ? '✅' : '❌'}</td>
+                    </tr>
+                `;
+            });
+            
+            html += `
+                    </tbody>
+                </table>
+                
+                <div style="margin-top: 30px; padding: 20px; background: #f8f9fa; border-radius: 15px;">
+                    <h3>📊 Interpretation Guide</h3>
+                    <p><strong>Mean Absolute Error (MAE):</strong> Average percentage point difference between predictions and actual results. Lower is better.</p>
+                    <p><strong>Root Mean Squared Error (RMSE):</strong> Emphasizes larger prediction errors. Lower is better.</p>
+                    <p><strong>Direction Accuracy:</strong> Percentage of stocks where the prediction correctly identified whether the price would go up or down.</p>
+                    <p><strong>Color Coding:</strong> 
+                        <span class="accuracy-good">Green (&lt;1% error)</span> = Excellent, 
+                        <span class="accuracy-fair">Orange (1-3% error)</span> = Fair, 
+                        <span class="accuracy-poor">Red (&gt;3% error)</span> = Poor
+                    </p>
+                </div>
+            `;
+            
+            resultsDiv.innerHTML = html;
+        }
+    </script>
+</body>
+</html>
