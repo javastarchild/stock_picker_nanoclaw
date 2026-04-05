@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  mediawiki:
+    build: .
+    image: smw-mediawiki:1.43
+    container_name: smw-wiki
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    volumes:
+      - ./LocalSettings.php:/var/www/html/LocalSettings.php
+      - wiki-images:/var/www/html/images
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      - MEDIAWIKI_DB_HOST=db
+      - MEDIAWIKI_DB_NAME=mediawiki
+      - MEDIAWIKI_DB_USER=wikiuser
+      - MEDIAWIKI_DB_PASSWORD=wikipass
+
+  db:
+    image: mariadb:10.11
+    container_name: smw-db
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: mediawiki
+      MYSQL_USER: wikiuser
+      MYSQL_PASSWORD: wikipass
+      MYSQL_ROOT_PASSWORD: rootpass
+    volumes:
+      - wiki-db:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+
+volumes:
+  wiki-db:
+  wiki-images:
