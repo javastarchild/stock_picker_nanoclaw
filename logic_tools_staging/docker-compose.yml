@@ -1,0 +1,24 @@
+version: "3.9"
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "5050:5000"   # 5050 on host (avoid conflict with SMW wiki on 8080)
+    restart: unless-stopped
+    environment:
+      - CYC_INDEX_PATH=/app/resources/cyc_index.json
+      - FLASK_DEBUG=false
+    volumes:
+      - ./resources:/app/resources:ro  # mount resources read-only (ZIPs + index)
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "8091:80"    # 8091 on host (SMW wiki is on 8080)
+    depends_on:
+      - backend
