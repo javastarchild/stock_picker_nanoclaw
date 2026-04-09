@@ -68,6 +68,13 @@ $wgGroupPermissions['*']['createaccount'] = false;
 $wgGroupPermissions['sysop']['smw-admin'] = true;
 
 ## =========================================================
+## URL Protocols
+## =========================================================
+## Remove 'news:' so [[News:...]] wikilinks resolve to the News namespace
+## instead of being parsed as NNTP newsgroup external URLs.
+$wgUrlProtocols = array_diff($wgUrlProtocols, ['news:']);
+
+## =========================================================
 ## Skin
 ## =========================================================
 wfLoadSkin( 'Vector' );
