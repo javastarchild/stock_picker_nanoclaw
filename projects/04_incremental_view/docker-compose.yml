@@ -1,0 +1,29 @@
+version: "3.9"
+
+# RisingWave: PostgreSQL-compatible streaming SQL database
+# Runs as a single-node all-in-one binary for local development
+#
+# Start: docker compose up -d
+# Connect: psql -h localhost -p 4566 -U root -d dev
+# Run demo: python seed.py
+# Stop: docker compose down
+
+services:
+  risingwave:
+    image: risingwavelabs/risingwave:latest
+    command: playground          # single-node mode (meta + compute + frontend in one process)
+    ports:
+      - "4566:4566"              # PostgreSQL wire protocol (psql / psycopg2)
+      - "5691:5691"              # Dashboard UI
+    volumes:
+      - rw_data:/var/lib/risingwave
+    environment:
+      RUST_LOG: info
+    healthcheck:
+      test: ["CMD", "pg_isready", "-h", "localhost", "-p", "4566", "-U", "root"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  rw_data:

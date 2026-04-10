@@ -1,0 +1,11 @@
+# Core (all prototypes 1, 3, 5 are pure Python — no dependencies)
+
+# Prototype 2: Probabilistic aggregation
+datasketch>=1.6.0          # optional: HyperLogLog++ production implementation
+
+# Prototype 4: Incremental materialized view (RisingWave)
+psycopg2-binary>=2.9.0     # PostgreSQL wire protocol client
+
+# Optional: Pathway (Prototype 3 advanced version)
+# pathway>=0.13.0           # Python-native incremental computation framework
+#                           # pip install pathway  (requires Python 3.10+)
